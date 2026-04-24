@@ -34,3 +34,17 @@ CREATE TABLE IF NOT EXISTS movimentacoes (
   CONSTRAINT fk_mov_origem FOREIGN KEY (conta_origem_id) REFERENCES contas(id),
   CONSTRAINT fk_mov_destino FOREIGN KEY (conta_destino_id) REFERENCES contas(id)
 );
+
+INSERT INTO clientes (nome, cpf, email, senha_hash)
+SELECT 'Cliente Teste', '11111111111', 'teste@sistema.com', SHA2('123456', 256)
+WHERE NOT EXISTS (
+  SELECT 1 FROM clientes WHERE cpf = '11111111111'
+);
+
+INSERT INTO contas (cliente_id, numero_conta, saldo, ativa)
+SELECT c.id, 'CC111111', 1000.00, 1
+FROM clientes c
+WHERE c.cpf = '11111111111'
+  AND NOT EXISTS (
+    SELECT 1 FROM contas WHERE cliente_id = c.id
+  );
